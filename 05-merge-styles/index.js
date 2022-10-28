@@ -11,7 +11,7 @@ fs.readdir(pathStyles, (err, data) => {
     arr = arr.filter(el => (path.extname(el) === '.css'));
 
     for (let i = 0; i < arr.length; i++) {
-        fs.readFile(`${pathStyles}/${arr[i]}`, 'utf-8', (err, data) => {
+        fs.readFile(`${pathStyles}/${arr[i]}`, 'utf-8', (err, data) => { 
             fs.appendFile(`${pathProject}/bundle.css`, `${data}`, (err) => {
                 if (err) throw err;
             });
