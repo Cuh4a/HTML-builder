@@ -1,20 +1,24 @@
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 
-const pathFolder = path.join(__dirname, 'secret-folder');
-
-fs.readdir(pathFolder, {withFileTypes:true}, (err, elements) => {
-  if(err) throw err;
-  const files = elements.filter(el => el.isFile() === true);
-  files.forEach((file) => {
-    const pathFile = path.join(pathFolder, file.name);
-    const fileObj = path.parse(pathFile); 
-    fs.stat(pathFile, (err, stats) => {
-      if(err) throw err;
-      const size = stats.size;
-      console.log(
-        `${fileObj.name} - ${fileObj.ext.slice(1)} - ${size.toString()}b`
-      );
-    });
-  });
-});
+fs.readdir('03-files-in-folder/secret-folder/', {
+    withFileTypes: true
+}, (err, data) => {
+    let arr = [];
+    if (err) console.error(err);
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].isFile() === true) {
+            arr.push(data[i].name)
+        }
+    }
+    for (let i = 0; i < arr.length; i++) {
+        let a = arr[i];
+        fs.stat('03-files-in-folder/secret-folder/' + a, (err, data) => {
+            if(err) console.error(err);
+            let name = path.parse('03-files-in-folder/secret-folder/' + a).name;
+            let ext = path.parse('03-files-in-folder/secret-folder/' + a).ext.replace('.', "");
+            let size = `${(data.size / 1024).toFixed(3)}kb`;
+            console.log(`${name} - ${ext} - ${size}`);
+        })
+    }
+})

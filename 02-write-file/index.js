@@ -1,26 +1,21 @@
-const fs = require('fs');
 const path = require('path');
-const input = process.stdin;
-const output = process.stdout;
-const startMsg = 'Hi, you craeted file! Please enter text!\n';
-const doneMsg = 'Goodbye! Good luck in learning!';
+const fs = require('fs');
+const { stdin, stdout } = process;
 
-const pathFile = path.join(__dirname, 'text.txt');
+const textPath = path.join(__dirname, 'text.txt');
+const writeStream = fs.createWriteStream(textPath);
 
-fs.writeFile(pathFile, '', (err) => {
-  if (err) throw err;
+writeStream.write('');
+
+stdout.write('Hello! Please enter text:\n ');
+
+stdin.on('data', (data) => {
+  if (data.toString().trim() === 'exit') process.exit();
+  writeStream.write(data);
 });
 
-const wrStm = fs.createWriteStream(pathFile);
-
-output.write(startMsg);
-input.on('data', (data) => {
-  if (data.toString().trim() === 'exit') {
-    process.exit();
-  } else {
-    wrStm.write(data.toString());
-  }
+process.on('SIGINT', () => {
+  process.exit();
 });
 
-process.on('SIGINT', process.exit);
-process.on('exit', () => output.write(doneMsg));
+process.on('exit', () => stdout.write('Good Luck! Have a nice day!'));

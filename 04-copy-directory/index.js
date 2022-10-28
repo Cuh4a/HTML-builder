@@ -1,35 +1,19 @@
 const path = require('path');
 const fs = require('fs');
-// читаем из папки 
-fs.readdir(path.join(__dirname, 'files'), 
-  { withFileTypes: true },
-  (err, files) => {
-    if (err) throw err;
+const pathDirectory = path.join(__dirname, 'files');
 
-    fs.rm(path.join(__dirname, 'files-copy'), { recursive: true, force: true }, err => {
-      if (err) throw err;
-
-      fs.mkdir(path.join(__dirname, 'files-copy'), { recursive: true }, (err) => {
+fs.readdir(pathDirectory, (err, data) => {
+    fs.mkdir('04-copy-directory/files-copy', {
+        recursive: true
+    }, (err) => {
         if (err) throw err;
-      });
-
-      files.forEach(file => {
-        fs.copyFile(path.join(__dirname, 'files', file.name), path.join(__dirname, 'files-copy', file.name), (err) => {
-          if (err) throw err;
-        });
-      });
-
-    });
-        
-    fs.mkdir(path.join(__dirname, 'files-copy'), { recursive: true }, (err) => {
-      if (err) throw err;
     });
 
-    files.forEach(file => {
-      fs.copyFile(path.join(__dirname, 'files', file.name), path.join(__dirname, 'files-copy', file.name), (err) => {
-        if (err) throw err;
-      });
-    });
-    
-  }
-);
+    for (let i = 0; i < data.length; i++) {
+        fs.copyFile(`${pathDirectory}/${data[i]}`, `04-copy-directory/files-copy/${data[i]}`, (err) => {
+            if (err) throw err;
+          });  
+    }
+})
+
+

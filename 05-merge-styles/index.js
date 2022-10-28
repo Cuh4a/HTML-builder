@@ -1,32 +1,20 @@
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
+const pathProject = path.join(__dirname, 'project-dist');
+const pathStyles = path.join(__dirname, 'styles');
 
-const pathFolter = path.join(__dirname, 'styles');
-const pathFile = path.join(__dirname, 'project-dist', 'bundle.css');
+fs.readdir(pathStyles, (err, data) => {
+    let arr = data;
+    fs.open(`${pathProject}/bundle.css`, 'w', (err) => {
+        if (err) throw err;
+    })
+    arr = arr.filter(el => (path.extname(el) === '.css'));
 
-async function createFileCss() {
-    try {
-        await fs.promises.writeFile(pathFile, '');
-        const files = await fs.promises.readdir(pathFolter, {
-            withFileTypes: true,
-        });
-        for (const file of files) {
-            const filePath = path.join(pathFolter, file.name);
-            const filePathObj = path.parse(filePath);
-            if (file.isFile() && filePathObj.ext === '.css') {
-                let data = '';
-                const readStream = fs.createReadStream(filePath, 'utf-8');
-                readStream.on('data', (chunk) => (data += chunk));
-                readStream.on('end', () =>
-                    fs.promises.appendFile(pathFile, data)
-                );
-            }
-        }
-
-        console.log('Создан файл bandle.css');
-    } catch (err) {
-        console.error(err);
+    for (let i = 0; i < arr.length; i++) {
+        fs.readFile(`${pathStyles}/${arr[i]}`, 'utf-8', (err, data) => {
+            fs.appendFile(`${pathProject}/bundle.css`, `${data}`, (err) => {
+                if (err) throw err;
+            });
+        })
     }
-}
-
-createFileCss();
+})
