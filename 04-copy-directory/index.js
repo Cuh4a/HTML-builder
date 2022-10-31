@@ -1,19 +1,41 @@
 const path = require('path');
 const fs = require('fs');
 const pathDirectory = path.join(__dirname, 'files');
+const {
+    readdir,
+    mkdir,
+    rm,
+    copyFile,
+} = require('fs/promises');
 
-fs.readdir(pathDirectory, (err, data) => {
-    fs.mkdir('04-copy-directory/files-copy', {
-        recursive: true
-    }, (err) => {
-        if (err) throw err;
-    });
 
-    for (let i = 0; i < data.length; i++) {
-        fs.copyFile(`${pathDirectory}/${data[i]}`, `04-copy-directory/files-copy/${data[i]}`, (err) => {
-            if (err) throw err;
-          });  
+
+async function copyDir(from, to) {
+    async function delayedFileCopy(file) {
+        const srcPath = path.join(from, file.name);
+        const destPath = path.join(to, file.name);
+
+        if (file.isFile()) {
+            await copyFile(srcPath, destPath);
+        } else {
+            await copyDir(srcPath, destPath);
+        }
     }
-})
 
+    try {
+        await rm(to, { force: true, recursive: true });
+        await mkdir(to, { recursive: true });
 
+        const folderContent = await readdir(from, { withFileTypes: true });
+
+        const promises = folderContent.map(delayedFileCopy);
+        await Promise.all(promises);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+const inPath = path.join(__dirname, 'files');
+const outPath = path.join(__dirname, 'files-copy');
+
+copyDir(inPath, outPath);
