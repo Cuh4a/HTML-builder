@@ -1,9 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const stream = fs.createReadStream(path.join(__dirname, 'text.txt'), 'utf-8');
+let res = '';
 
-fs.readFile('01-read-file/text.txt', 'utf-8', (err, data) => {
-    if (err) {
-        console.error(err);
-    }
-    console.log(data);
-})
+stream.on('data', chunk => res += chunk);
+stream.on('end', () => console.log(res));
+stream.on('error', error => console.log('Error', error.message));
